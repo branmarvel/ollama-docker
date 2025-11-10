@@ -1,0 +1,135 @@
+# Configuración de Modelos para Ollama
+# Este archivo contiene configuraciones recomendadas para diferentes GPUs
+
+# Configuración para GPUs con 16GB VRAM
+models_16gb:
+  # Modelos de programación
+  - name: deepseek-coder:6.7b
+    description: "Modelo especializado en programación y código"
+    size_gb: 4.1
+    use_case: "programming"
+    recommended: true
+    
+  - name: codellama:7b
+    description: "Modelo optimizado para tareas de código"
+    size_gb: 3.8
+    use_case: "programming"
+    
+  # Modelos generales
+  - name: deepseek-llm:7b
+    description: "Modelo de lenguaje general de alta calidad"
+    size_gb: 4.1
+    use_case: "general"
+    recommended: true
+    
+  - name: mistral:7b
+    description: "Modelo de alto rendimiento para tareas generales"
+    size_gb: 4.1
+    use_case: "general"
+    
+  - name: llama2:7b
+    description: "Modelo general Llama 2"
+    size_gb: 3.8
+    use_case: "general"
+    
+  # Modelos de chat
+  - name: vicuna:7b
+    description: "Modelo optimizado para conversación"
+    size_gb: 4.1
+    use_case: "chat"
+
+# Configuración para GPUs con 24GB VRAM
+models_24gb:
+  - name: deepseek-coder:33b
+    description: "Modelo grande especializado en programación"
+    size_gb: 19.2
+    use_case: "programming"
+    
+  - name: codellama:13b
+    description: "Modelo mediano optimizado para código"
+    size_gb: 7.4
+    use_case: "programming"
+    
+  - name: mistral:13b
+    description: "Modelo mediano de alto rendimiento"
+    size_gb: 7.4
+    use_case: "general"
+
+# Configuración para GPUs con 8GB VRAM
+models_8gb:
+  - name: deepseek-coder:1.3b
+    description: "Modelo pequeño para programación"
+    size_gb: 0.8
+    use_case: "programming"
+    
+  - name: codellama:7b
+    description: "Modelo optimizado para código"
+    size_gb: 3.8
+    use_case: "programming"
+    
+  - name: mistral:7b
+    description: "Modelo de alto rendimiento"
+    size_gb: 4.1
+    use_case: "general"
+
+# Parámetros de ejecución recomendados
+execution_params:
+  # Parámetros para modelos pequeños (< 8GB)
+  small_models:
+    temperature: 0.7
+    top_p: 0.9
+    top_k: 40
+    repeat_penalty: 1.1
+    batch_size: 512
+    
+  # Parámetros para modelos medianos (8-20GB)
+  medium_models:
+    temperature: 0.8
+    top_p: 0.95
+    top_k: 60
+    repeat_penalty: 1.15
+    batch_size: 1024
+    
+  # Parámetros para modelos grandes (> 20GB)
+  large_models:
+    temperature: 0.6
+    top_p: 0.85
+    top_k: 30
+    repeat_penalty: 1.2
+    batch_size: 2048
+
+# Configuración de contexto por modelo
+context_config:
+  7b_models:
+    context_length: 4096
+    max_tokens: 2048
+    
+  13b_models:
+    context_length: 4096
+    max_tokens: 3072
+    
+  33b_models:
+    context_length: 8192
+    max_tokens: 4096
+
+# Scripts de ejemplo para diferentes casos de uso
+example_scripts:
+  code_generation: |
+    # Generar código Python
+    ollama run deepseek-coder:6.7b "Crea una función en Python que ordene una lista usando quicksort"
+    
+  code_explanation: |
+    # Explicar código
+    ollama run deepseek-coder:6.7b "Explica este código: $(cat script.py)"
+    
+  bug_fixing: |
+    # Buscar y arreglar bugs
+    ollama run deepseek-coder:6.7b "Encuentra y corrige los errores en este código: $(cat buggy.py)"
+    
+  documentation: |
+    # Generar documentación
+    ollama run deepseek-coder:6.7b "Genera documentación en formato docstring para esta función: $(cat function.py)"
+    
+  test_generation: |
+    # Generar tests
+    ollama run deepseek-coder:6.7b "Crea tests unitarios para esta función: $(cat function.py)"

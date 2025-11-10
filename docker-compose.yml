@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  ollama:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ollama-gpu
+    restart: unless-stopped
+    
+    # Configuración GPU NVIDIA
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    
+    # Variables de entorno
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-deepseek-coder:6.7b}
+      - OLLAMA_HOST=0.0.0.0
+      - OLLAMA_PORT=11434
+    
+    # Puertos
+    ports:
+      - "11434:11434"
+    
+    # Volúmenes para persistencia
+    volumes:
+      - ollama_models:/home/ollama/.ollama
+      - ./scripts:/home/ollama/scripts
+    
+    # Salud del contenedor
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    # Configuración de memoria y CPU
+    mem_limit: 8g
+    cpus: 4
+    
+    # Grupo de contenedores
+    networks:
+      - ollama-network
+
+  # Servicio opcional: interfaz web para Ollama
+  ollama-web:
+    image: ghcr.io/ollama-webui/ollama-webui:main
+    container_name: ollama-webui
+    restart: unless-stopped
+    ports:
+      - "3000:8080"
+    environment:
+      - OLLAMA_API_BASE_URL=http://ollama:11434
+    depends_on:
+      - ollama
+    networks:
+      - ollama-network
+
+# Volúmenes nombrados
+volumes:
+  ollama_models:
+    driver: local
+
+# Red personalizada
+networks:
+  ollama-network:
+    driver: bridge
